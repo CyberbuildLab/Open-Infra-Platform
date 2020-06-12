@@ -17,7 +17,7 @@
    height="32.3125"
    id="svg11300"
    sodipodi:version="0.32"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
    sodipodi:docname="clothoid.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.1">
@@ -108,23 +108,24 @@
      borderopacity="0.25490196"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627417"
-     inkscape:cx="11.106883"
-     inkscape:cy="14.170431"
+     inkscape:zoom="11.313709"
+     inkscape:cx="16.445591"
+     inkscape:cy="8.8469362"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
      inkscape:showpageshadow="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1137"
-     inkscape:window-x="2552"
-     inkscape:window-y="222"
+     inkscape:window-width="2560"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0" />
+     fit-margin-bottom="0"
+     inkscape:pagecheckerboard="true" />
   <metadata
      id="metadata4">
     <rdf:RDF>
@@ -141,7 +142,7 @@
         <dc:source>http://jimmac.musichall.cz</dc:source>
         <cc:license
            rdf:resource="http://creativecommons.org/licenses/by-sa/2.0/" />
-        <dc:title />
+        <dc:title></dc:title>
         <dc:subject>
           <rdf:Bag>
             <rdf:li>edit</rdf:li>
@@ -184,7 +185,7 @@
     <path
        d="m 9.7251885,32.900373 c 3.8475385,-0.03713 7.7074125,0.08586 11.5401035,-0.331373 2.119275,-0.228342 4.228292,-0.619678 6.256301,-1.285022 2.145264,-0.699272 4.203829,-1.785749 5.9936,-3.167723 0.885332,-0.701638 1.729628,-1.4618 2.44792,-2.33669 0.614265,-0.756264 1.172442,-1.562791 1.631315,-2.423014 1.198354,-2.268421 1.716893,-4.935417 1.232397,-7.471581 C 38.456374,13.857375 37.437671,11.93996 35.9001,10.557939 34.415424,9.2088231 32.436055,8.3909729 30.421895,8.3981661 28.634198,8.3935761 26.839762,9.039703 25.5146,10.249261 c -1.186057,1.064942 -1.990369,2.558395 -2.164609,4.14815 -0.224628,1.822227 0.412267,3.740525 1.727442,5.030094 1.15322,1.157393 2.82658,1.775399 4.455538,1.619969 1.703982,-0.143409 3.313197,-1.175678 4.11751,-2.69034"
        id="polyline19767"
-       style="fill:none;stroke:#ffffff;stroke-width:4.60099983;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:none;stroke:#9ec9dc;stroke-width:4.60099983;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccccccccccc" />
   </g>
