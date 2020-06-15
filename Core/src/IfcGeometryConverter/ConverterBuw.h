@@ -16,7 +16,7 @@
 */
 
 
-/*Kike. April, 2019. Modified code to pass colour information for rendering. 
+/*Kike. April, 2020. Modified code to pass colour information for rendering. 
 In the original version, colours are assigned per triangle and type of object, eg. all the triangles in all the wall objects are rendered in gray.
 Therefore, a random colour is produced before rendering each mesh inside meshSet to colour all the faces (i.e. triangles) of an object. Applied to walls
 
