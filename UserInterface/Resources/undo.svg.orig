@@ -17,8 +17,8 @@
    height="32.3125"
    id="svg11300"
    sodipodi:version="0.32"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="undo.svg"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="redo.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.1">
   <defs
@@ -108,24 +108,23 @@
      borderopacity="0.25490196"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="8"
-     inkscape:cx="-14.102456"
-     inkscape:cy="6.678697"
+     inkscape:zoom="2"
+     inkscape:cx="-58.060544"
+     inkscape:cy="25.246011"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
      inkscape:showpageshadow="false"
-     inkscape:window-width="2560"
-     inkscape:window-height="1017"
+     inkscape:window-width="1600"
+     inkscape:window-height="837"
      inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-y="292"
      inkscape:window-maximized="1"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0"
-     inkscape:pagecheckerboard="true" />
+     fit-margin-bottom="0" />
   <metadata
      id="metadata4">
     <rdf:RDF>
@@ -183,7 +182,7 @@
        y="5.351532"
        transform="scale(-1,1)" />
     <path
-       style="color:#000000;fill:#9ec9dc;fill-opacity:1;fill-rule:nonzero;stroke:#9ec9dc;stroke-width:1.67195344;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:block;overflow:visible"
+       style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:1.67195344;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:block;overflow:visible"
        d="M 33.025248,33.012929 C 46.305752,12.083733 25.358857,4.368677 18.947056,15.545513 l -5.219828,-3.052692 2.903191,13.633772 13.735002,-3.903325 c 0,0 -5.38294,-3.148083 -5.38294,-3.148083 4.08144,-7.695431 17.629972,-2.721677 8.042767,13.937744 z"
        id="path1432"
        sodipodi:nodetypes="ccccccc"

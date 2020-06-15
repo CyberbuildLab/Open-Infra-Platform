@@ -14,11 +14,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TUM Open Infra Platform</string>
+   <string>BIMERR Scan-to-BIM Tool</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../Resources/OpenInfraPlatform.qrc">
-    <normaloff>:/icons/icon.ico</normaloff>:/icons/icon.ico</iconset>
+    <normaloff>:/icons/scan2BIM.ico</normaloff>:/icons/scan2BIM.ico</iconset>
   </property>
   <property name="animated">
    <bool>false</bool>
@@ -709,7 +709,7 @@
            <rect>
             <x>9</x>
             <y>9</y>
-            <width>261</width>
+            <width>263</width>
             <height>331</height>
            </rect>
           </property>
