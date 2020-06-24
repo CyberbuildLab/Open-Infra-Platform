@@ -1,28 +1,16 @@
 /*
     Copyright (c) 2018 Technical University of Munich
     Chair of Computational Modeling and Simulation.
-
     TUM Open Infra Platform is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License Version 3
     as published by the Free Software Foundation.
-
     TUM Open Infra Platform is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
-
-
-/*Kike. April, 2020. Modified code to pass colour information for rendering. 
-In the original version, colours are assigned per triangle and type of object, eg. all the triangles in all the wall objects are rendered in gray.
-Therefore, a random colour is produced before rendering each mesh inside meshSet to colour all the faces (i.e. triangles) of an object. Applied to walls
-
-*/
-
-
 
 // visual studio
 #pragma once
@@ -52,22 +40,89 @@ namespace OpenInfraPlatform
 	namespace Core 
 	{
 		namespace IfcGeometryConverter {
+			/*!
+			\brief Internal implementation of a bounding box.
+			This is a wrapper around the carve's aabb (axis-aligned bounding box).
+			*/
+			struct BoundingBox : public carve::geom::aabb<3> {
+				using base = carve::geom::aabb<3>;
+			public:
+				//! constructor
+				BoundingBox() { reset(); }
+				/*!
+				 * \brief updates the bounding box extent
+				 *
+				 * \param[in] x the x-coordinate of the point
+				 * \param[in] y the y-coordinate of the point
+				 * \param[in] z the z-coordinate of the point
+				 */
+				void update(const float x, const float y, const float z)
+				{
+					if (isEmpty())
+					{
+						base::fit( carve::geom::VECTOR(x, y, z));
+						isFirst = false;
+					}
+					else
+						update( base( carve::geom::VECTOR( x, y, z ), base::mid() ) );
+				}
+				/*!
+				 * \brief updates the bounding box extent
+				 *
+				 * \param[in] other the other bounding box to update self with
+				 */
+				void update(const base& other)
+				{
+					if (other.isEmpty())
+						return;
+
+					if (isEmpty())
+					{
+						base::operator=( other );
+						isFirst = false;
+					}
+					else
+						base::unionAABB( other );
+				}
+				//! resets the bounding box to zero
+				void reset() { base::empty(); isFirst = true; }
+				//! is the bounding box empty?
+				bool isEmpty() { return isFirst && base::isEmpty(); }
+				//! returns the min-max extents
+				std::string toString() const {
+					return "min: (" + std::to_string(min().x()) + ", " + std::to_string(min().y()) + ", " + std::to_string(min().z())
+					   + ") max: (" + std::to_string(max().x()) + ", " + std::to_string(max().y()) + ", " + std::to_string(max().z()) + ")";
+				}
+				//! returns the center point of the bounding box
+				buw::Vector3d center() const { return buw::Vector3d( base::mid().x, base::mid().y, base::mid().z); }
+				//! returns the smallest point of the bounding box
+				buw::Vector3d min() const { return buw::Vector3d( base::min().x, base::min().y, base::min().z ); }
+				//! returns the maximal point of the bounding box
+				buw::Vector3d max() const { return buw::Vector3d( base::max().x, base::max().y, base::max().z ); }
+				//! carve::geom::aabb doesn't have a "not set" value, but rather everything is 0,0,0 per default. This variable helps overcome this.
+				bool isFirst = true;
+			};
+
 			struct IndexedMeshDescription {
 				std::vector<uint32_t>		indices;
 				std::vector<VertexLayout>	vertices;
 				bool isEmpty() { return (indices.size() == 0 && vertices.size() == 0); };
+				void reset() { indices.clear(); vertices.clear(); }
 			};
 
 			struct PolylineDescription {
 				std::vector<uint32_t>		indices;
 				std::vector<buw::Vector3f>	vertices;
 				bool isEmpty() { return (indices.size() == 0 && vertices.size() == 0); };
+				void reset() { indices.clear(); vertices.clear(); }
 			};
 
 			struct IfcGeometryModel {
+				BoundingBox			   bb_;
 				IndexedMeshDescription meshDescription_;
 				PolylineDescription    polylineDescription_;
 				bool isEmpty() { return (meshDescription_.isEmpty() && polylineDescription_.isEmpty()); };
+				void reset() { bb_.reset(); meshDescription_.reset(); polylineDescription_.reset(); }
 			};
 
 
@@ -97,9 +152,8 @@ namespace OpenInfraPlatform
 					static bool insertFaceIntoBuffers(const std::shared_ptr<typename IfcEntityTypesT::IfcProduct>& product,
 						const carve::mesh::Face<3>* face,
 						std::vector<VertexLayout>& vertices,
-						std::vector<uint32_t>& indices, buw::Vector3f colour) //Kike. Added colour to pass colour info
+						std::vector<uint32_t>& indices)
 					{
-						
 						const int32_t numVertices = face->nVertices();
 
 						if(numVertices > 4) {
@@ -109,7 +163,7 @@ namespace OpenInfraPlatform
 						}
 
 						//determine color
-						buw::Vector3f color = determineColorFromBaseTypes(product, colour); //Kike. Added colour
+						buw::Vector3f color = determineColorFromBaseTypes(product);
 						//if (color.w() <= FullyTransparentAlphaThreshold) {
 						//	return false; //skip fully transparent vertices
 						//}
@@ -192,10 +246,8 @@ namespace OpenInfraPlatform
 					static bool insertMeshIntoBuffers(const std::shared_ptr<typename IfcEntityTypesT::IfcProduct>& product,
 						const carve::mesh::Mesh<3>* mesh,
 						std::vector<VertexLayout>& vertices,
-						std::vector<uint32_t>& indices, buw::Vector3f colour) //Kike. Added colour
+						std::vector<uint32_t>& indices)
 					{
-
-
 						// walk through all faces of the mesh
 						bool ret = false;
 						for(const auto& face : mesh->faces) {
@@ -205,34 +257,9 @@ namespace OpenInfraPlatform
 								continue;
 							}
 
-							
-							ret |= insertFaceIntoBuffers(product, face, vertices, indices, colour); //Kike. Added colour
+							ret |= insertFaceIntoBuffers(product, face, vertices, indices);
 						}
 						return ret;
-					}
-
-					//Kike. Create a buw::Vector3f with random values between 0 and 1
-					static buw::Vector3f getRandomVector3f() {
-						buw::Vector3f vec;
-
-						// First create an instance of an engine.
-						std::random_device rnd_device;
-						// Specify the engine and distribution.
-						std::mt19937 mersenne_engine{ rnd_device() };  // Generates random integers
-						std::uniform_real_distribution<float> dist{ 0, 1 };
-
-						auto gen = [&dist, &mersenne_engine]() {
-							return dist(mersenne_engine);
-						};
-
-						std::vector<float> v(3);
-						std::generate(begin(v), end(v), gen);
-
-						for (int i = 0; i < 3; i++)
-							vec[i] = v[i];
-
-						return vec;
-
 					}
 
 					static bool insertMeshSetIntoBuffers(const std::shared_ptr<typename IfcEntityTypesT::IfcProduct>& product,
@@ -246,13 +273,8 @@ namespace OpenInfraPlatform
 						}
 
 						// walk through all meshes of the mesh set
-
 						for(const auto& mesh : meshSet->meshes) {
-
-							//Kike. Same colour for all the faces in the mesh
-							buw::Vector3f colour = getRandomVector3f(); 
-
-							ret |= insertMeshIntoBuffers(product, mesh, vertices, indices, colour); //Kike. Added colour
+							ret |= insertMeshIntoBuffers(product, mesh, vertices, indices);
 						}
 						return ret;
 					}
@@ -366,7 +388,6 @@ namespace OpenInfraPlatform
 							buw::Vector3f vertex(position[0], position[1], position[2]);
 
 							/*const std::string vKey = createVertexKeyLine(vertex);
-
 							if (ConverterBuwUtil::vertexMapLines_.find(vKey) == ConverterBuwUtil::vertexMapLines_.end())
 							{
 							vertices.push_back(vertex);
@@ -405,20 +426,13 @@ namespace OpenInfraPlatform
 						//! NOTE (mk): Could be optimized if we omit cache building and just add triangles (with redundant vertices)
 
 						// clear all descriptions
-						auto& meshDescription = ifcGeometryModel->meshDescription_;
-						meshDescription.vertices.clear();
-						meshDescription.indices.clear();
-
-						auto& polylineDescription = ifcGeometryModel->polylineDescription_;
-						polylineDescription.vertices.clear();
-						polylineDescription.indices.clear();
+						ifcGeometryModel->reset();
 
 						// obtain maximum number of threads supported by machine
 						const unsigned int maxNumThreads = std::thread::hardware_concurrency();
 
-						// gather tasks for all threads
+						// split up tasks for all threads
 						std::vector<std::vector<std::shared_ptr<ShapeInputDataT<IfcEntityTypesT>>>> tasks(maxNumThreads);
-
 						uint32_t counter = 0;
 						for(auto it = shapeDatas.begin(); it != shapeDatas.end(); ++it) {
 							std::shared_ptr<ShapeInputDataT<IfcEntityTypesT>> shapeData = it->second;
@@ -430,7 +444,7 @@ namespace OpenInfraPlatform
 						std::vector<std::thread> threads(maxNumThreads);
 						// every thread gets its local triangle/polyline pool
 						for(unsigned int k = 0; k < maxNumThreads; ++k) {
-							threads[k] = std::thread(&ConverterBuwT<IfcEntityTypesT>::createTrianglesJob, tasks[k], k, &meshDescription, &polylineDescription);
+							threads[k] = std::thread(&ConverterBuwT<IfcEntityTypesT>::createTrianglesJob, tasks[k], k, ifcGeometryModel);
 						}
 
 						// wait for all threads to be finished
@@ -444,18 +458,18 @@ namespace OpenInfraPlatform
 
 					// convert mesh and polyline descriptions to triangles/lines for BlueFramework
 					static void createTrianglesJob(const std::vector<std::shared_ptr<ShapeInputDataT<IfcEntityTypesT>>>& tasks,
-						int threadID, IndexedMeshDescription* meshDesc, PolylineDescription* polyDesc)
+						int threadID, buw::ReferenceCounted<IfcGeometryModel>& ifcGeometryModel/*IndexedMeshDescription* meshDesc, PolylineDescription* polyDesc*/)
 					{
 						//#ifdef _DEBUG
 						//				std::cout << "Info\t| IfcGeometryConverter.ConverterBuw: Starting thread " << threadID << " to create triangles and polylines" << std::endl;
 						//#endif
+						BoundingBox bb;
 						IndexedMeshDescription threadMeshDesc;
 						PolylineDescription threadLineDesc;
-						threadMeshDesc.vertices.clear();
-						threadMeshDesc.indices.clear();
-						threadLineDesc.vertices.clear();
-						threadLineDesc.indices.clear();
 
+						bb.reset();
+						threadMeshDesc.reset();
+						threadLineDesc.reset();
 
 						for(const auto& shapeData : tasks) {
 							const std::shared_ptr<typename IfcEntityTypesT::IfcProduct>& product = shapeData->ifc_product;
@@ -479,22 +493,32 @@ namespace OpenInfraPlatform
 							}
 						}
 
+						// update the bounding box
+						for (const auto& vertex : threadMeshDesc.vertices)
+							bb.update(vertex.position[0], vertex.position[1], vertex.position[2]);
+						for (const auto& vertex : threadLineDesc.vertices)
+							bb.update(vertex[0], vertex[1], vertex[2]);
+
+						// lock the multithread access to the lists
 						ConverterBuwUtil::s_geometryMutex.lock();
 
-						const uint64_t globalIndexOffsetMesh = meshDesc->vertices.size();
-						const uint64_t globalIndexOffsetLines = polyDesc->vertices.size();
+						const uint64_t globalIndexOffsetMesh = ifcGeometryModel->meshDescription_.vertices.size();
+						const uint64_t globalIndexOffsetLines = ifcGeometryModel->polylineDescription_.vertices.size();
 
 						std::for_each(threadMeshDesc.indices.begin(), threadMeshDesc.indices.end(),
 							[&](uint32_t& index) { index += globalIndexOffsetMesh; });
 						std::for_each(threadLineDesc.indices.begin(), threadLineDesc.indices.end(),
 							[&](uint32_t& index) { index += globalIndexOffsetLines; });
 
-						meshDesc->vertices.insert(meshDesc->vertices.end(), threadMeshDesc.vertices.begin(), threadMeshDesc.vertices.end());
-						meshDesc->indices.insert(meshDesc->indices.end(), threadMeshDesc.indices.begin(), threadMeshDesc.indices.end());
-						polyDesc->vertices.insert(polyDesc->vertices.end(), threadLineDesc.vertices.begin(), threadLineDesc.vertices.end());
-						polyDesc->indices.insert(polyDesc->indices.end(), threadLineDesc.indices.begin(), threadLineDesc.indices.end());
+						ifcGeometryModel->meshDescription_	  .vertices.insert(ifcGeometryModel->meshDescription_	 .vertices.end(), threadMeshDesc.vertices.begin(), threadMeshDesc.vertices.end());
+						ifcGeometryModel->meshDescription_	  .indices .insert(ifcGeometryModel->meshDescription_	 .indices .end(), threadMeshDesc.indices .begin(), threadMeshDesc.indices .end());
+						ifcGeometryModel->polylineDescription_.vertices.insert(ifcGeometryModel->polylineDescription_.vertices.end(), threadLineDesc.vertices.begin(), threadLineDesc.vertices.end());
+						ifcGeometryModel->polylineDescription_.indices .insert(ifcGeometryModel->polylineDescription_.indices .end(), threadLineDesc.indices .begin(), threadLineDesc.indices .end());
+						ifcGeometryModel->bb_.update(bb);
 
+						// free the access to the lists
 						ConverterBuwUtil::s_geometryMutex.unlock();
+						
 						//#ifdef _DEBUG
 						//				std::cout << "Info\t| IfcGeometryConverter.ConverterBuw: Finished thread " << threadID << std::endl;
 						//#endif
@@ -503,17 +527,11 @@ namespace OpenInfraPlatform
 				protected:
 
 					static buw::Vector3f determineColorFromBaseTypes(
-						const std::shared_ptr<typename IfcEntityTypesT::IfcProduct>& product, buw::Vector3f colour) //Kike. Added colour to pass data per object and not triangle
+						const std::shared_ptr<typename IfcEntityTypesT::IfcProduct>& product)
 					{
 						if(std::dynamic_pointer_cast<typename IfcEntityTypesT::IfcWindow>(product)) {
 							return buw::Vector3f(0.1f, 0.6f, 1.0f);//, 0.4f);
 						}
-						// Kike. Adding colour for walls
-						else if (std::dynamic_pointer_cast<typename IfcEntityTypesT::IfcWall>(product)
-							|| std::dynamic_pointer_cast<typename IfcEntityTypesT::IfcWallStandardCase>(product)) {
-							return colour;
-						}
-						//
 
 						// Balken
 						else if(std::dynamic_pointer_cast<typename IfcEntityTypesT::IfcBeam>(product)
@@ -610,6 +628,7 @@ namespace OpenInfraPlatform
 	}
 }
 
+EMBED_CORE_IFCGEOMETRYCONVERTER_INTO_OIP_NAMESPACE(BoundingBox)
 EMBED_CORE_IFCGEOMETRYCONVERTER_INTO_OIP_NAMESPACE(IfcGeometryModel)
 
 #endif

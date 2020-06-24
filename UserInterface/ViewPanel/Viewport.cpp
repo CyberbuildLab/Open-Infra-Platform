@@ -1,16 +1,13 @@
 /*
     Copyright (c) 2018 Technical University of Munich
     Chair of Computational Modeling and Simulation.
-
     TUM Open Infra Platform is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License Version 3
     as published by the Free Software Foundation.
-
     TUM Open Infra Platform is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -143,19 +140,15 @@ Viewport::Viewport(const buw::eRenderAPI renderAPI, bool warp, bool msaa, QWidge
     BLUE_LOG(trace) << "Creating effects (2)";
     demEffect_ = buw::makeReferenceCounted<DEMEffect>(renderSystem_.get(), viewport_, depthStencilMSAA_, pickBuffer_, depthStencil_, worldBuffer_);
     demEffect_->init();
-
     BLUE_LOG(trace) << "Creating effects (3)";
     trafficSignEffect_ = buw::makeReferenceCounted<TrafficSignEffect>(renderSystem_.get(), viewport_, depthStencilMSAA_, pickBuffer_, depthStencil_, worldBuffer_);
     trafficSignEffect_->init();
-
     BLUE_LOG(trace) << "Creating effects (4)";
     alignmentEffect_ = buw::makeReferenceCounted<AlignmentEffect>(renderSystem_.get(), viewport_, depthStencilMSAA_, pickBuffer_, depthStencil_, worldBuffer_, viewportBuffer_, pickIdBuffer_);
     alignmentEffect_->init();
-
     BLUE_LOG(trace) << "Creating effects (5)";
     girderEffect_ = buw::makeReferenceCounted<GirderEffect>(renderSystem_.get(), viewport_, depthStencilMSAA_, worldBuffer_, viewportBuffer_);
     girderEffect_->init();
-
     BLUE_LOG(trace) << "Creating effects (6)";
     slabFieldEffect_ = buw::makeReferenceCounted<SlabFieldEffect>(renderSystem_.get(), viewport_, depthStencilMSAA_, worldBuffer_, viewportBuffer_);
     slabFieldEffect_->init();*/
@@ -785,24 +778,18 @@ void Viewport::onChange() {
     onChange(data.getLatesChangeFlag());
 }
 
-void Viewport::onChange(ChangeFlag changeFlag) {
+void Viewport::onChange(ChangeFlag changeFlag) 
+{
+	// the extents
+	oip::BoundingBox bb;
+
     auto& data = OpenInfraPlatform::Core::DataManagement::DocumentManager::getInstance().getData();
  //   auto dem = data.getDigitalElevationModel();
  //   auto alignment = data.getAlignmentModel();
  //   auto trafficSignModel = data.getTrafficSignModel();
  //   auto girderModel = data.getGirderModel();
  //   auto slabFieldModel = data.getSlabFieldModel();
-    auto ifcGeometryModel = data.getIfcGeometryModel();
-#ifdef OIP_WITH_POINT_CLOUD_PROCESSING
-	auto pointCloud = data.getPointCloud();
-#endif
-
 	//auto proxyModel = data.getProxyModel();
-
-    buw::Vector3d min, max;
-    min = buw::Vector3d(-1, -1, -1);
-    max = buw::Vector3d(1, 1, 1);
-
    /* if (dem && dem->getSurfaceCount() > 0)
         dem->getSurfacesExtend(min, max);
     else if (alignment && alignment->getAlignmentCount() > 0) {
@@ -810,26 +797,43 @@ void Viewport::onChange(ChangeFlag changeFlag) {
         min = bb.getMinimum();
         max = bb.getMaximum();
 	}*/
+
+	// get the extents of the IFC model
+    auto ifcGeometryModel = data.getIfcGeometryModel();
+	if (ifcGeometryModel && !ifcGeometryModel->isEmpty())
+	{
+		bb.update(ifcGeometryModel->bb_);
+		BLUE_LOG(trace) << "boundingbox:" << bb.toString();
+	}
+
+
+	// get the extents of the point cloud
 #ifdef OIP_WITH_POINT_CLOUD_PROCESSING
+	auto pointCloud = data.getPointCloud();
 	if(pointCloud && pointCloud->size() > 0) {
 		CCVector3 minPos, maxPos;
 		pointCloud->getBoundingBox(minPos, maxPos);
-		min = buw::Vector3d(minPos.x, minPos.y, minPos.z);
-		max = buw::Vector3d(maxPos.x, maxPos.y, maxPos.z);
-
-		BLUE_LOG(trace) << "min:" << min;
-		BLUE_LOG(trace) << "max:" << max;
+		bb.update(minPos.x, minPos.y, minPos.z);
+		bb.update(maxPos.x, maxPos.y, maxPos.z);
+		BLUE_LOG(trace) << "boundingbox:" << bb.toString();
 	}
 #endif
+
+	// if bounding box is still on default, overwrite
+	if( bb.isEmpty() )
+	{
+		bb.fit( carve::geom::VECTOR( -1., -1., -1. ), carve::geom::VECTOR(  1.,  1.,  1. ));
+	}
+
 	
 
-    buw::Vector3d offset = (min + max) / -2.f;
-    minExtend_ = (min + offset).cast<float>();
-    maxExtend_ = (max + offset).cast<float>();
+    buw::Vector3d offset = -bb.center();
+    minExtend_ = (bb.min() + offset).cast<float>();
+    maxExtend_ = (bb.max() + offset).cast<float>();
 	buw::Vector3f extend = maxExtend_ - minExtend_;
 	
 
-    boundingBoxEffect_->setBounds(min, max);
+    boundingBoxEffect_->setBounds(bb.min(), bb.max());
 
  //   if(changeFlag & ChangeFlag::DigitalElevationModel && dem) {
  //       demEffect_->setDEM(dem, offset);

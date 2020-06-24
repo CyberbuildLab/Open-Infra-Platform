@@ -21,3 +21,7 @@ Documentation/doxymentation/*
 
 .vscode
 
+UserInterface/ViewPanel/ViewportDOTcpp
+UserInterface/ViewPanel/Effects/IfcGeometryEffectDOTh
+UserInterface/ViewPanel/Effects/IfcGeometryEffectDOTcpp
+Core/src/IfcGeometryConverter/ConverterBuwDOTh
