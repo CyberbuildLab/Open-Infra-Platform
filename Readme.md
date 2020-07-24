@@ -8,11 +8,7 @@
 
 ## Documentation
 
-[Installation, Usage & Updating](docs/markdown/User.md)
-
-[Building](docs/markdown/Building.md)
-
-[Developer Documentation](docs/markdown/DeveloperDocumentation.md)
+[Installation and building](Installation.md)
 
 ## License
 
