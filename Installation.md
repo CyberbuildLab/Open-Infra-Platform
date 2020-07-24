@@ -8,16 +8,16 @@
 
 # STEPS FOR BUILDING THE OIP SOLUTION IN MSVC
 
-In Git GUI:
+In **Git GUI**:
 
 - Clone CyberBuildLab OIP repo https://github.com/CyberbuildLab/Open-Infra-Platform
 
 
-In CMAKE (x64)
+In **CMAKE** (x64)
 
 - Empty "build" folder (very important)
 
-- click on "Configure" (is this necessary?)
+- click on "Configure"
 
 - Set the following CMake variables:
 	- EARLYBINDING: Check IFC4x1
@@ -27,7 +27,7 @@ In CMAKE (x64)
 	
 - click on "Configure" ("Configuring done" message)
 
-- IF you want to add e57 support: 
+- *IF* you want to add e57 support: 
 
 	- Set the following CMake variables:
 		- OPTION: check OPTION_USE_LIB_E57FORMAT which is a plugin to CloudCompare
@@ -40,28 +40,28 @@ In CMAKE (x64)
 
 	- click on "Configure" ("Configuring done" message)
 
-- END IF
+- *END IF*
 
 - click on "Generate "("Generating done" message)
 
 - click on "Open Project"
 
 
-In MSVC
+In **MSVC**
 
 - Build "Commands.GenerateEarlyBinding.IFC4X1" (in the folder OpenInfraPlatform/ExpressBindingGenerator/Commands)
 
 - Close MSVC. 
 
 
-In CMAKE (x64):
+In **CMAKE**:
 
 - click on "Generate"
 
 - click on "Open project"
 
 
-In MSVC
+In **MSVC**
 
 - Build OpenInfraPlatform.IFC4X1 (in the folder OpenInfraPlatform/EarlyBinding)
 
