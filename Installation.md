@@ -1,4 +1,4 @@
-# REQUIREMENTS
+# Requirements
 
 - Qt 5.12.2 Installed and included in path. Get the general installer (free) and select 5.12.2 during the installation 
 
@@ -6,7 +6,7 @@
 
 
 
-# STEPS FOR BUILDING THE OIP SOLUTION IN MSVC
+# Building the OIP solution in MSVC
 
 In **Git GUI**:
 
